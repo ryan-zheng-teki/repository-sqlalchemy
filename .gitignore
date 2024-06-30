@@ -1,0 +1,53 @@
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Python caches
+__pycache__/
+.pytest_cache/
+
+# Virtual environment
+venv/
+env/
+.env/
+.venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Distribution files
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Logs and databases
+*.log
+*.db
+*.sqlite
+
+# Environment-specific files
+.env.local
+.env.*.local
+
+# Custom ignores
+# Add any additional files or directories specific to your project
