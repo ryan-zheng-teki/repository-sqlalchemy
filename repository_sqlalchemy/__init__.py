@@ -6,4 +6,6 @@ __all__ = [
     "transaction",
     "transactional",
     "Base",
+    "DatabaseConfig",
+    "DatabaseEngineFactory",
 ]
