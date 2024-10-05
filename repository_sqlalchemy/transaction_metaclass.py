@@ -21,6 +21,7 @@ class TransactionalMetaclass(type):
         transactional_prefixes = (
             "find",
             "create",
+            "update",  # Added "update" to the list of transactional prefixes
             "delete",
         )
 
