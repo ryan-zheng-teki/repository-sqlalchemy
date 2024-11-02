@@ -20,6 +20,7 @@ class TransactionalMetaclass(type):
     def apply_transactional_wrapper(cls, attrs: Dict[str, Any]) -> None:
         transactional_prefixes = (
             "find",
+            "get",
             "create",
             "update",  # Added "update" to the list of transactional prefixes
             "delete",
