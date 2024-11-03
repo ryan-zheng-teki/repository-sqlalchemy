@@ -1,17 +1,9 @@
 import logging
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    List,
-    TypeVar,
-)
-from sqlalchemy.orm import (
-    Session,
-)
+from typing import Any, Dict, Generic, List, TypeVar
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 
-from repository_sqlalchemy.transaction_metaclass import TransactionalMetaclass
+from repository_sqlalchemy.metaclasses import SingletonRepositoryMetaclass
 from repository_sqlalchemy.session_management import session_context_var
 
 logger = logging.getLogger(__name__)
@@ -21,8 +13,7 @@ Base = declarative_base()
 # Define a type variable for the model
 ModelType = TypeVar("ModelType")
 
-
-class BaseRepository(Generic[ModelType], metaclass=TransactionalMetaclass):
+class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass):
     # Subclasses should set this to the concrete model class
     model = None
 
@@ -37,21 +28,14 @@ class BaseRepository(Generic[ModelType], metaclass=TransactionalMetaclass):
         return obj
     
     def update(self, instance: ModelType, data: Dict[str, Any]) -> ModelType:
-            """
-            Update an existing model instance with the provided data.
+        for key, value in data.items():
+            if hasattr(instance, key):
+                setattr(instance, key, value)
+            else:
+                raise AttributeError(f"{type(instance).__name__} has no attribute '{key}'")
 
-            :param instance: The model instance to update.
-            :param data: A dictionary of fields to update and their new values.
-            :return: The updated model instance.
-            """
-            for key, value in data.items():
-                if hasattr(instance, key):
-                    setattr(instance, key, value)
-                else:
-                    raise AttributeError(f"{type(instance).__name__} has no attribute '{key}'")
-
-            self.session.flush()
-            return instance
+        self.session.flush()
+        return instance
 
     def bulk_create(self, objects: List[ModelType]) -> List[ModelType]:
         self.session.bulk_save_objects(objects)
@@ -77,13 +61,6 @@ class BaseRepository(Generic[ModelType], metaclass=TransactionalMetaclass):
         return self.session.query(self.model).count()
 
     def find_page(self, offset: int = 0, limit: int = 10) -> List[ModelType]:
-        """Generic pagination method applicable to any model. offset-limit
-        based.
-
-        :param offset: The number of records to skip.
-        :param limit: The maximum number of items to return.
-        :return: A list of model instances.
-        """
         return (
             self.session.query(self.model)
             .order_by(self.model.id)

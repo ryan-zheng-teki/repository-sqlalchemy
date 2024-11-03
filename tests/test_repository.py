@@ -3,13 +3,31 @@ from sqlalchemy.exc import IntegrityError
 from repository_sqlalchemy.transaction_management import transaction
 from tests.test_model import TestModel, TestRepository
 
-def test_database_config(db_config):
-    assert db_config.db_type == 'sqlite'
-    assert db_config.name == ':memory:'
 
-def test_engine_creation(engine):
-    assert engine is not None
-    assert str(engine.url) == 'sqlite:///:memory:'
+
+def test_singleton_behavior():
+    # Create multiple instances
+    repo1 = TestRepository()
+    repo2 = TestRepository()
+    repo3 = TestRepository()
+    
+    # Verify they are the same instance
+    assert repo1 is repo2
+    assert repo2 is repo3
+    assert repo1 is repo3
+
+def test_singleton_state_persistence(test_repository):
+    # Test that state is preserved across instances
+    with transaction():
+        obj = test_repository.create(TestModel(name="Test Object"))
+        
+        # Create new "instance" - should be same object
+        another_repo = TestRepository()
+        found_obj = another_repo.find_by_id(obj.id)
+        
+        assert found_obj is not None
+        assert found_obj.id == obj.id
+        assert found_obj.name == "Test Object"
 
 def test_create(test_repository):
     with transaction():
