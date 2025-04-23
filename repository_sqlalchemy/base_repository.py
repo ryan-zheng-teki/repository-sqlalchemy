@@ -22,12 +22,20 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         return session_context_var.get()
 
     def create(self, obj: ModelType) -> ModelType:
+        """Insert a new row and return the persisted object."""
         self.session.add(obj)
         self.session.flush()
         self.session.refresh(obj)
         return obj
-    
+
     def update(self, instance: ModelType, data: Dict[str, Any]) -> ModelType:
+        """
+        Update fields on an existing object and persist.
+        If the instance is detached, merge it into the current session first.
+        """
+        # Re-attach detached instances
+        instance = self.session.merge(instance)
+
         for key, value in data.items():
             if hasattr(instance, key):
                 setattr(instance, key, value)
@@ -38,6 +46,7 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         return instance
 
     def bulk_create(self, objects: List[ModelType]) -> List[ModelType]:
+        """Insert multiple new rows in bulk."""
         self.session.bulk_save_objects(objects)
         self.session.flush()
         return objects
@@ -70,5 +79,8 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         )
 
     def delete(self, obj: ModelType) -> None:
+        """Delete a row from the database."""
+        # Merge to reattach if detached
+        obj = self.session.merge(obj)
         self.session.delete(obj)
         self.session.flush()
