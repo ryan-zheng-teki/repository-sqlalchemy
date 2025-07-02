@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Generic, List, TypeVar
+from typing import Any, Dict, Generic, List, TypeVar, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -28,19 +28,22 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         self.session.refresh(obj)
         return obj
 
-    def update(self, instance: ModelType, data: Dict[str, Any]) -> ModelType:
+    def update(self, instance: ModelType, data: Optional[Dict[str, Any]] = None) -> ModelType:
         """
-        Update fields on an existing object and persist.
+        Update an existing object and persist.
         If the instance is detached, merge it into the current session first.
+        If 'data' is provided, it performs a partial update on the instance's fields.
+        If 'data' is None, it assumes the instance is already updated and merges its state.
         """
-        # Re-attach detached instances
+        # Re-attach detached instances to ensure they are managed by the current session
         instance = self.session.merge(instance)
 
-        for key, value in data.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
-            else:
-                raise AttributeError(f"{type(instance).__name__} has no attribute '{key}'")
+        if data:
+            for key, value in data.items():
+                if hasattr(instance, key):
+                    setattr(instance, key, value)
+                else:
+                    raise AttributeError(f"{type(instance).__name__} has no attribute '{key}'")
 
         self.session.flush()
         return instance
