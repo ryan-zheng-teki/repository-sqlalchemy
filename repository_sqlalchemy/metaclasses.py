@@ -1,14 +1,15 @@
-from functools import wraps
-from typing import Any, Callable, Type, Dict, Tuple
 import threading
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
 from repository_sqlalchemy.transaction_management import transactional
 
+
 class SingletonMeta(type):
-    """
-    Thread-safe implementation of the Singleton pattern using metaclass.
-    """
-    _instances = {}
+    """Thread-safe implementation of the Singleton pattern using metaclass."""
+
+    _instances: dict = {}
     _lock = threading.Lock()
 
     def __call__(cls, *args, **kwargs):
@@ -19,11 +20,11 @@ class SingletonMeta(type):
                     cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
+
 class TransactionalMetaclass(type):
-    """
-    Metaclass that automatically applies transactional decorator to repository methods.
-    """
-    def __new__(cls, name: str, bases: tuple, attrs: Dict[str, Any]) -> Type:
+    """Metaclass that automatically applies transactional decorator to repository methods."""
+
+    def __new__(cls, name: str, bases: tuple, attrs: dict[str, Any]) -> type:
         # Existing transactional logic
         cls.apply_transactional_wrapper(attrs)
 
@@ -36,7 +37,7 @@ class TransactionalMetaclass(type):
         return new_class
 
     @classmethod
-    def apply_transactional_wrapper(cls, attrs: Dict[str, Any]) -> None:
+    def apply_transactional_wrapper(cls, attrs: dict[str, Any]) -> None:
         transactional_prefixes = (
             "find",
             "get",
@@ -46,9 +47,7 @@ class TransactionalMetaclass(type):
         )
 
         for attr_name, attr_value in attrs.items():
-            if callable(attr_value) and any(
-                attr_name.startswith(prefix) for prefix in transactional_prefixes
-            ):
+            if callable(attr_value) and any(attr_name.startswith(prefix) for prefix in transactional_prefixes):
                 attrs[attr_name] = cls.add_transactional(attr_value)
 
     @staticmethod
@@ -60,20 +59,19 @@ class TransactionalMetaclass(type):
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             return transactional(method)(*args, **kwargs)
 
-        wrapper._transactional = True
+        wrapper._transactional = True  # type: ignore
         return wrapper
 
     @staticmethod
-    def set_model_attribute(new_class: Type, bases: Tuple[Type, ...]) -> None:
-        if bases and any(base.__name__ == 'BaseRepository' for base in bases):
-            if hasattr(new_class, '__orig_bases__'):
-                model_type = new_class.__orig_bases__[0].__args__[0]
-                if not hasattr(new_class, 'model') or new_class.model is None:
-                    new_class.model = model_type
+    def set_model_attribute(new_class: type, bases: tuple[type, ...]) -> None:
+        if bases and any(base.__name__ == "BaseRepository" for base in bases) and hasattr(new_class, "__orig_bases__"):
+            model_type = new_class.__orig_bases__[0].__args__[0]
+            if not hasattr(new_class, "model") or new_class.model is None:
+                new_class.model = model_type  # type: ignore
+
 
 class SingletonRepositoryMetaclass(TransactionalMetaclass, SingletonMeta):
-    """
-    Combined metaclass that applies both repository functionality and singleton pattern.
+    """Combined metaclass that applies both repository functionality and singleton pattern.
+
     This ensures that the repository is a singleton and retains repository behaviors.
     """
-    pass

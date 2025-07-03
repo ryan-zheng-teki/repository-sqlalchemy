@@ -1,7 +1,8 @@
 import logging
-from typing import Any, Dict, Generic, List, TypeVar, Optional
-from sqlalchemy.orm import Session
+from typing import Any, Generic, TypeVar
+
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from repository_sqlalchemy.metaclasses import SingletonRepositoryMetaclass
 from repository_sqlalchemy.session_management import session_context_var
@@ -10,12 +11,20 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
+
+class BaseModel(Base):
+    __abstract__ = True
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+
 # Define a type variable for the model
-ModelType = TypeVar("ModelType")
+ModelType = TypeVar("ModelType", bound=BaseModel)
+
 
 class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass):
     # Subclasses should set this to the concrete model class
-    model = None
+    model: type[ModelType]
 
     @property
     def session(self) -> Session:
@@ -28,9 +37,9 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         self.session.refresh(obj)
         return obj
 
-    def update(self, instance: ModelType, data: Optional[Dict[str, Any]] = None) -> ModelType:
-        """
-        Update an existing object and persist.
+    def update(self, instance: ModelType, data: dict[str, Any] | None = None) -> ModelType:
+        """Update an existing object and persist.
+
         If the instance is detached, merge it into the current session first.
         If 'data' is provided, it performs a partial update on the instance's fields.
         If 'data' is None, it assumes the instance is already updated and merges its state.
@@ -48,7 +57,7 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
         self.session.flush()
         return instance
 
-    def bulk_create(self, objects: List[ModelType]) -> List[ModelType]:
+    def bulk_create(self, objects: list[ModelType]) -> list[ModelType]:
         """Insert multiple new rows in bulk."""
         self.session.bulk_save_objects(objects)
         self.session.flush()
@@ -63,23 +72,17 @@ class BaseRepository(Generic[ModelType], metaclass=SingletonRepositoryMetaclass)
             logger.error(f"Error during expunge_all: {str(e)}")
             raise
 
-    def find_by_id(self, id: int) -> ModelType:
-        return self.session.query(self.model).filter_by(id=id).first()
+    def find_by_id(self, pk: int) -> ModelType | None:
+        return self.session.query(self.model).filter_by(id=pk).first()
 
-    def find_all(self) -> List[ModelType]:
+    def find_all(self) -> list[ModelType]:
         return self.session.query(self.model).all()
 
     def get_count(self) -> int:
         return self.session.query(self.model).count()
 
-    def find_page(self, offset: int = 0, limit: int = 10) -> List[ModelType]:
-        return (
-            self.session.query(self.model)
-            .order_by(self.model.id)
-            .offset(offset)
-            .limit(limit)
-            .all()
-        )
+    def find_page(self, offset: int = 0, limit: int = 10) -> list[ModelType]:
+        return self.session.query(self.model).order_by(self.model.id).offset(offset).limit(limit).all()
 
     def delete(self, obj: ModelType) -> None:
         """Delete a row from the database."""
