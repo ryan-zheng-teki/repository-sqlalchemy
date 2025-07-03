@@ -1,5 +1,10 @@
 # repository_sqlalchemy
 
+[![build-status-image]][build-status]
+[![codeql-image]][codeql]
+[![pypi-version]][pypi]
+[![pypi-downloads]][pypi]
+
 repository_sqlalchemy is a small library that simplifies SQLAlchemy usage with automatic transaction and session management. It provides a base repository pattern implementation, similar to JPA in the Java world.
 
 ## Features
@@ -39,18 +44,17 @@ Here's a comprehensive example demonstrating how to use the repository_sqlalchem
 
 ```python
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from repository_sqlalchemy import BaseRepository, Base, transaction
+from repository_sqlalchemy import BaseRepository, BaseModel, transaction
 from typing import List, Dict, Any
 
 
-class UserModel(Base):
+class UserModel(BaseModel):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
 
-class PostModel(Base):
+class PostModel(BaseModel):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
@@ -136,3 +140,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
+
+[build-status-image]: https://github.com/ryan-zheng-teki/repository-sqlalchemy/actions/workflows/python-package.yml/badge.svg
+[build-status]: https://github.com/ryan-zheng-teki/repository-sqlalchemy/actions/workflows/python-package.yml
+[codeql-image]: https://github.com/ryan-zheng-teki/repository-sqlalchemy/actions/workflows/codeql.yml/badge.svg
+[codeql]: https://github.com/ryan-zheng-teki/repository-sqlalchemy/actions/workflows/codeql.yml
+[pypi-version]: https://img.shields.io/pypi/v/repository-sqlalchemy.svg
+[pypi-downloads]: https://img.shields.io/pypi/dm/repository-sqlalchemy?color=%232E73B2&logo=python&logoColor=%23F9D25F
+[pypi]: https://pypi.org/project/repository-sqlalchemy/

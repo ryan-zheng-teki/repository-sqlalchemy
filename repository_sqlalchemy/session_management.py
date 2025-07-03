@@ -1,22 +1,25 @@
 import os
-from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
+import typing
 from contextvars import ContextVar
+
+from sqlalchemy.orm import sessionmaker
+
 from repository_sqlalchemy.database_config import DatabaseConfig, DatabaseEngineFactory
 
-session_context_var: ContextVar[any] = ContextVar("db_session", default=None)
+session_context_var: ContextVar[typing.Any] = ContextVar("db_session", default=None)
 
 _engine = None
 _Session = None
 
+
 def get_engine():
     global _engine
     if _engine is None:
-        db_type = os.environ.get('DB_TYPE', 'postgresql')
+        db_type = os.environ.get("DB_TYPE", "postgresql")
         db_config = DatabaseConfig(db_type)
-        _engine = DatabaseEngineFactory.create_engine(
-            db_config)
+        _engine = DatabaseEngineFactory.create_engine(db_config)
     return _engine
+
 
 def get_session():
     global _Session

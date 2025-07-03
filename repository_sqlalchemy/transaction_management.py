@@ -6,6 +6,7 @@ from repository_sqlalchemy.session_management import get_session, session_contex
 
 logger = logging.getLogger(__name__)
 
+
 @contextmanager
 def transaction():
     session = session_context_var.get()
@@ -35,11 +36,9 @@ def transaction():
             session.close()
             logger.debug("Transaction committed")
     except Exception as e:
-        logger.exception(
-            "Exception occurred during transaction, rolling back", exc_info=e
-        )
+        logger.exception("Exception occurred during transaction, rolling back", exc_info=e)
         if is_nested:
-            savepoint.rollback() 
+            savepoint.rollback()
             logger.debug("Savepoint rolled back")
         else:
             session.rollback()
@@ -49,6 +48,7 @@ def transaction():
     finally:
         if not is_nested:
             session_context_var.set(None)
+
 
 def transactional(func):
     @wraps(func)

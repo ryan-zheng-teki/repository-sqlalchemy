@@ -1,6 +1,6 @@
-import pytest
 from repository_sqlalchemy.transaction_management import transaction
 from tests.test_model import TestModel, TestRepository
+
 
 def test_inherited_update_runs_transaction(test_repository):
     # Create an object outside explicit transaction
@@ -16,6 +16,7 @@ def test_inherited_update_runs_transaction(test_repository):
     with transaction():
         found = repo.find_by_id(obj.id)
         assert found.name == "Updated Name"
+
 
 def test_inherited_delete_runs_transaction(test_repository):
     repo = TestRepository()

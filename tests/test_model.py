@@ -1,11 +1,12 @@
-from sqlalchemy import Column, Integer, String
-from repository_sqlalchemy.base_repository import Base, BaseRepository
+from sqlalchemy import Column, String
+
+from repository_sqlalchemy.base_repository import BaseModel, BaseRepository
 
 
-class TestModel(Base):
+class TestModel(BaseModel):
     __tablename__ = "test_model"
-    id = Column(Integer, primary_key=True)
+
     name = Column(String)
 
-class TestRepository(BaseRepository[TestModel]):
-    pass
+
+class TestRepository(BaseRepository[TestModel]): ...
