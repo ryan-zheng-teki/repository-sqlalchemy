@@ -43,6 +43,7 @@ class TransactionalMetaclass(type):
             "create",
             "update",
             "delete",
+            "upsert",
         )
 
         for attr_name, attr_value in attrs.items():
