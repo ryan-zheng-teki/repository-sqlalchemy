@@ -21,6 +21,7 @@ def remove_test_db():
 def db_config():
     # Ensure we start with a clean database file
     remove_test_db()
+    os.makedirs(os.path.dirname(TEST_DB_PATH), exist_ok=True)
     
     os.environ['DB_TYPE'] = 'sqlite'
     os.environ['DB_NAME'] = TEST_DB_PATH
