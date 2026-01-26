@@ -1,6 +1,42 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "repository_sqlalchemy"
+version = "0.1.7"
+description = "A small library to simplify SQLAlchemy usage with FastAPI"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Ryan Zheng", email = "ryan.zheng.work@gmail.com" }]
+dependencies = [
+  "sqlalchemy>=2.0.31",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.2",
+  "pytest-asyncio>=0.23.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/ryan-zheng-teki/repository_sqlalchemy"
+Repository = "https://github.com/ryan-zheng-teki/repository_sqlalchemy"
+Issues = "https://github.com/ryan-zheng-teki/repository_sqlalchemy/issues"
+
+[tool.setuptools]
+include-package-data = true
+packages = { find = {} }
+
+[tool.setuptools.package-data]
+repository_sqlalchemy = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

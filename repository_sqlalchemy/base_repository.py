@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Dict, Generic, List, TypeVar, Optional
-from sqlalchemy.orm import Session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, declarative_base
 
 from repository_sqlalchemy.metaclasses import SingletonRepositoryMetaclass
 from repository_sqlalchemy.session_management import session_context_var

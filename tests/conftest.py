@@ -53,3 +53,13 @@ def tables(engine):
 @pytest.fixture
 def test_repository(tables):
     return TestRepository()
+
+@pytest.fixture(autouse=True)
+def clean_db(engine, tables):
+    Session = sessionmaker(bind=engine, expire_on_commit=False)
+    session = Session()
+    try:
+        session.query(TestModel).delete()
+        session.commit()
+    finally:
+        session.close()

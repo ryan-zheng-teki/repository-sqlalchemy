@@ -18,6 +18,13 @@ You can install repository_sqlalchemy using pip:
 pip install repository_sqlalchemy
 ```
 
+## Development (uv)
+
+```bash
+uv sync --dev
+uv run pytest
+```
+
 ## Release (Tag-Based)
 
 We use a tag-based release flow:
