@@ -27,8 +27,8 @@ git tag -a v1.2.3 -m "v1.2.3"
 git push origin v1.2.3
 ```
 
-This triggers GitHub Actions to build and publish to PyPI. Make sure the `PYPI_API_TOKEN`
-secret is configured in the GitHub repo settings.
+This triggers GitHub Actions to build and publish to PyPI using **Trusted Publishing**
+via GitHub OIDC (no token required). Configure the trusted publisher in PyPI once.
 
 ## Usage
 
