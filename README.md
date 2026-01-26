@@ -18,6 +18,18 @@ You can install repository_sqlalchemy using pip:
 pip install repository_sqlalchemy
 ```
 
+## Release (Tag-Based)
+
+We use a tag-based release flow:
+
+```bash
+git tag -a v1.2.3 -m "v1.2.3"
+git push origin v1.2.3
+```
+
+This triggers GitHub Actions to build and publish to PyPI. Make sure the `PYPI_API_TOKEN`
+secret is configured in the GitHub repo settings.
+
 ## Usage
 
 ### Environment Setup
